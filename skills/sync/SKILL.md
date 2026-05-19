@@ -30,6 +30,12 @@ ls "$HOME/.claude/skills"
 
 If missing, run `mkdir -p "$HOME/.claude/skills"`.
 
+Also ensure the claude-context directory exists:
+
+```bash
+mkdir -p "$HOME/claude-context"
+```
+
 ## Step 3 — Sync
 
 ```bash

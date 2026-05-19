@@ -10,6 +10,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "Installing Claude skills from $REPO_DIR..."
 
 mkdir -p "$HOME/.claude/skills"
+mkdir -p "$HOME/claude-context"
 
 rsync -av "$REPO_DIR/skills/" "$HOME/.claude/skills/"
 
