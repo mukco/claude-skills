@@ -7,18 +7,33 @@ description: Sync the claude-skills repo into this machine's ~/.claude/ environm
 
 Pull the latest skills and config from the `claude-skills` repo and install them into `~/.claude/`.
 
-## Steps
+## Step 1 — Locate the repo
 
-1. Find the local clone of the `claude-skills` repo. Default: `~/Documents/code/claude-skills/`. Ask the user if it's not there.
-2. Pull latest from GitHub.
-3. Rsync all skills into `~/.claude/skills/` — merges without deleting local-only skills.
-4. Copy `CLAUDE.md` to `~/.claude/CLAUDE.md`.
-5. Confirm what changed.
-
-## Implementation
+Check these paths in order, use the first that exists:
 
 ```bash
-REPO="${HOME}/Documents/code/claude-skills"
+~/Documents/code/claude-skills    # Arch Linux (home)
+~/code/claude-skills               # Mac (work) — common
+~/projects/claude-skills           # Mac (work) — alternative
+~/Developer/claude-skills          # Mac (work) — alternative
+```
+
+If none exist, ask the user where they cloned the repo.
+
+## Step 2 — Locate ~/.claude/
+
+`$HOME/.claude/` is the correct path on both Arch Linux and macOS. Verify it exists:
+
+```bash
+ls "$HOME/.claude/skills"
+```
+
+If missing, run `mkdir -p "$HOME/.claude/skills"`.
+
+## Step 3 — Sync
+
+```bash
+REPO="<resolved path from Step 1>"
 
 git -C "$REPO" pull
 
@@ -27,8 +42,12 @@ rsync -av "$REPO/skills/" "$HOME/.claude/skills/"
 cp "$REPO/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 ```
 
+## Step 4 — Confirm
+
+Report what changed. Remind the user to restart Claude Code to pick up new skills.
+
 ## Notes
 
-- Local-only skills (not in the repo) are preserved — rsync merges, it does not wipe.
-- After syncing, restart Claude Code to pick up any new skills.
-- To push local changes back to the repo, copy updated skills into `$REPO/skills/` and commit.
+- `rsync` merges — local-only skills not in the repo are preserved.
+- `rsync` is available by default on both macOS and Arch Linux.
+- To push local skill changes back: copy updated skill dirs into `$REPO/skills/`, commit, and push.
