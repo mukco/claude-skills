@@ -1,12 +1,13 @@
 # claude-skills
 
-Personal Claude Code skill library and global config, synced across machines.
+Personal skill library and global config for Claude Code CLI and Claude Cowork.
 
 ## What's in here
 
-- **`CLAUDE.md`** — shared global instructions for Claude Code (skill triggers, context directory)
-- **`skills/`** — Claude Code skills covering languages, frameworks, and workflows
-- **`install.sh`** — bootstrap script for setting up a new machine
+- **`.claude-plugin/plugin.json`** — plugin manifest (makes this repo installable in Claude Cowork and Claude Code)
+- **`CLAUDE.md`** — shared global instructions for Claude Code CLI (skill triggers, context directory)
+- **`skills/`** — skills usable in both Claude Code CLI and as a Cowork plugin
+- **`install.sh`** — bootstrap script for Claude Code CLI standalone install
 - **`merge_claude_md.py`** — merges the shared CLAUDE.md block without overwriting machine-specific config
 
 ## Skills
@@ -68,7 +69,28 @@ Pulls the latest from this repo and installs into `~/.claude/`. Detects the repo
 
 ---
 
-## Setup — new machine
+## Installation
+
+### Claude Cowork / Claude Code (plugin — recommended)
+
+Install directly from GitHub inside any Claude Code or Cowork session:
+
+```
+/plugin install github:mukco/claude-skills
+```
+
+Skills are namespaced under the plugin name: `/claude-skills:ruby`, `/claude-skills:ts`, etc.
+
+To update:
+```
+/plugin update claude-skills
+```
+
+---
+
+### Claude Code CLI (standalone install)
+
+Use this if you want skills available without the `/claude-skills:` namespace prefix — e.g. `/ruby` instead of `/claude-skills:ruby`.
 
 ```bash
 git clone https://github.com/mukco/claude-skills.git ~/Documents/code/claude-skills
@@ -78,19 +100,18 @@ cd ~/Documents/code/claude-skills
 
 Then restart Claude Code.
 
-## Keeping in sync
-
-From inside any Claude Code session:
-
+To pull updates from inside a Claude Code session:
 ```
 /sync
 ```
 
-This pulls the latest from GitHub, merges skills into `~/.claude/skills/`, and updates the shared CLAUDE.md block. Machine-specific content in your local CLAUDE.md is never overwritten.
+This pulls the latest, merges skills into `~/.claude/skills/`, and updates the shared CLAUDE.md block. Machine-specific content in your local CLAUDE.md is never overwritten.
+
+---
 
 ## Adding or updating a skill
 
 1. Edit the skill in `~/.claude/skills/<skill-name>/`
-2. Copy the updated directory into this repo: `rsync -a ~/.claude/skills/<skill-name>/ ~/Documents/code/claude-skills/skills/<skill-name>/`
+2. Copy it into this repo: `rsync -a ~/.claude/skills/<skill-name>/ ~/Documents/code/claude-skills/skills/<skill-name>/`
 3. Update the Skills section in `README.md`
-4. Commit and push
+4. Commit and push — plugin installs update automatically on next `/plugin update`
