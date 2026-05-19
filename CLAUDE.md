@@ -1,3 +1,4 @@
+<!-- BEGIN claude-skills -->
 # Claude Code — Global Instructions
 
 ## Context directory
@@ -21,3 +22,4 @@ Invoke the relevant skill automatically when the context matches:
 | Reviewing code for quality, discussing architecture, refactoring | `principles` |
 | Writing a GitHub issue or ticket | `issue` |
 | Referencing a PR or issue number, checking repo state | `github` |
+<!-- END claude-skills -->

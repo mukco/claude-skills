@@ -14,7 +14,7 @@ mkdir -p "$HOME/claude-context"
 
 rsync -av "$REPO_DIR/skills/" "$HOME/.claude/skills/"
 
-cp "$REPO_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+python3 "$REPO_DIR/merge_claude_md.py" "$REPO_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 
 echo ""
 echo "Done. Restart Claude Code to pick up new skills."

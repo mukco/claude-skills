@@ -45,8 +45,10 @@ git -C "$REPO" pull
 
 rsync -av "$REPO/skills/" "$HOME/.claude/skills/"
 
-cp "$REPO/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+python3 "$REPO/merge_claude_md.py" "$REPO/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 ```
+
+`merge_claude_md.py` replaces the `<!-- BEGIN claude-skills -->…<!-- END claude-skills -->` block in the local CLAUDE.md with the repo version. Content outside that block (machine-specific config) is never touched. If the markers don't exist yet, the block is appended.
 
 ## Step 4 — Confirm
 
