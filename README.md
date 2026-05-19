@@ -98,15 +98,20 @@ This pulls the latest, merges skills into `~/.claude/skills/`, and updates the s
 
 ### Claude Cowork / Claude Code (plugin)
 
-Load the plugin for a single session (useful for testing or temporary use):
+This repo is also a single-plugin marketplace (`.claude-plugin/marketplace.json`), so you can install it permanently in Claude Cowork (Mac desktop) or Claude Code:
 
-```bash
-claude --plugin-dir ~/Documents/code/claude-skills
+```
+/plugin marketplace add mukco/claude-skills
+/plugin install claude-skills@claude-skills
 ```
 
 Skills are namespaced under the plugin name: `/claude-skills:ruby`, `/claude-skills:ts`, etc.
 
-**For permanent plugin installation:** The plugin structure is ready (validated ✔), but requires distribution via a Claude Code marketplace. Alternatively, you can add the `--plugin-dir` flag to your shell alias for `claude` to load it automatically.
+**For a single session** (no install — useful for testing):
+
+```bash
+claude --plugin-dir ~/Documents/code/claude-skills
+```
 
 ---
 
