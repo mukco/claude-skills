@@ -1,9 +1,11 @@
 ---
 name: sync
-description: Sync the claude-skills repo into this machine's ~/.claude/ environment. Use when setting up a new machine or pulling latest skill updates from GitHub.
+description: "CLI standalone only — sync the claude-skills repo into ~/.claude/. For plugin installs, use /plugin update claude-skills instead."
 ---
 
-# Sync Claude Skills
+# Sync Claude Skills (CLI Standalone)
+
+> **Plugin users**: run `/plugin update claude-skills` instead — this skill is for the CLI standalone install only.
 
 Pull the latest skills and config from the `claude-skills` repo and install them into `~/.claude/`.
 

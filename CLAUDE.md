@@ -7,6 +7,8 @@
 
 ## Skill triggers
 
+> These trigger names apply to the **CLI standalone install** (`/ruby`, `/ts`, etc.). Plugin installs use namespaced names (`/claude-skills:ruby`).
+
 Invoke the relevant skill automatically when the context matches:
 
 | Context | Skill |
