@@ -71,26 +71,11 @@ Pulls the latest from this repo and installs into `~/.claude/`. Detects the repo
 
 ## Installation
 
-### Claude Cowork / Claude Code (plugin — recommended)
+### Claude Code CLI (standalone — recommended)
 
-Install directly from GitHub inside any Claude Code or Cowork session:
+This is the primary installation method. Skills are available without namespace prefix (e.g., `/ruby`, `/ts`, `/python`).
 
-```
-/plugin install github:mukco/claude-skills
-```
-
-Skills are namespaced under the plugin name: `/claude-skills:ruby`, `/claude-skills:ts`, etc.
-
-To update:
-```
-/plugin update claude-skills
-```
-
----
-
-### Claude Code CLI (standalone install)
-
-Use this if you want skills available without the `/claude-skills:` namespace prefix — e.g. `/ruby` instead of `/claude-skills:ruby`.
+**Install:**
 
 ```bash
 git clone https://github.com/mukco/claude-skills.git ~/Documents/code/claude-skills
@@ -100,7 +85,9 @@ cd ~/Documents/code/claude-skills
 
 Then restart Claude Code.
 
-To pull updates from inside a Claude Code session:
+**Update:**
+
+From inside any Claude Code session:
 ```
 /sync
 ```
@@ -109,9 +96,40 @@ This pulls the latest, merges skills into `~/.claude/skills/`, and updates the s
 
 ---
 
+### Claude Cowork / Claude Code (plugin)
+
+Load the plugin for a single session (useful for testing or temporary use):
+
+```bash
+claude --plugin-dir ~/Documents/code/claude-skills
+```
+
+Skills are namespaced under the plugin name: `/claude-skills:ruby`, `/claude-skills:ts`, etc.
+
+**For permanent plugin installation:** The plugin structure is ready (validated ✔), but requires distribution via a Claude Code marketplace. Alternatively, you can add the `--plugin-dir` flag to your shell alias for `claude` to load it automatically.
+
+---
+
+### Developer / Local Testing
+
+**Validate plugin structure:**
+```bash
+claude plugin validate ~/Documents/code/claude-skills
+```
+
+**Test changes without installation:**
+```bash
+claude --plugin-dir ~/Documents/code/claude-skills
+```
+
+This loads the plugin for the current session only, useful for testing changes before committing.
+
+---
+
 ## Adding or updating a skill
 
 1. Edit the skill in `~/.claude/skills/<skill-name>/`
 2. Copy it into this repo: `rsync -a ~/.claude/skills/<skill-name>/ ~/Documents/code/claude-skills/skills/<skill-name>/`
 3. Update the Skills section in `README.md`
-4. Commit and push — plugin installs update automatically on next `/plugin update`
+4. Commit and push
+5. Users update via `/sync` (CLI install) or by restarting with `--plugin-dir` (plugin load)
