@@ -1,0 +1,8 @@
+.git
+**/node_modules
+**/dist
+**/tmp
+**/log
+**/config/master.key
+**/.env
+docker-compose.yml

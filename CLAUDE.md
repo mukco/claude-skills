@@ -24,4 +24,5 @@ For CLI standalone installs, invoke the relevant skill automatically when the co
 | Reviewing code for quality, discussing architecture, refactoring | `principles` |
 | Writing a GitHub issue or ticket | `issue` |
 | Referencing a PR or issue number, checking repo state | `github` |
+| Deploying, shipping, or debugging an app on the edwardsfamily.app estate (Kamal/VPS), creating a new app from the template, backups/restore, Railway legacy | `deploy` |
 <!-- END claude-skills -->

@@ -59,6 +59,11 @@ GitHub issue writing with the WHAT/WHY/HOW framework. Covers issue structure (ti
 #### `pr`
 Creates a GitHub pull request from the current branch. Analyses commits and diff to write a concise title, summary bullets, and test-plan checklist. Pushes the branch if needed. Accepts `--draft` flag.
 
+### Deployment
+
+#### `deploy`
+Ship apps to the edwardsfamily.app estate (DigitalOcean VPS + Kamal 2 + Cloudflare DNS + R2 backups + WARP egress): new apps from `mukco/rails-vite-template` via `bin/new-app`, day-2 `kamal deploy`, accessories, `bin/status`/`bin/restore`, and the gotchas (unique cookie keys, datacenter-IP blocks, asdf/kamal env, secrets syntax). Railway material kept as legacy under `references/railway/`. Previously `railway`: Audits a repo into a service topology (database choice, where background jobs run, volumes for SQLite/uploads, sidecars on private networking, hardcoded localhost URLs that must become env vars, secrets from `.env.example`), then scaffolds the Rails+Vite single-image Dockerfile/`railway.json`, walks the CLI end to end, and ships day-2 deploys with a test gate, deployment polling, and a health check. Encodes the gotchas that cost real time (variables need a redeploy, volumes are root-owned and single-service, stale hashed assets must 404, GitHub App install). Includes worked topologies for family-hub, nofuss, and the baseball app.
+
 ### Other
 
 #### `mcp-server`
