@@ -25,7 +25,7 @@ That creates `mukco/<slug>` from the template, clones to `~/Documents/code/<slug
 estate, and commits both repos. Then, in the app:
 1. Fill `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`/`ALLOWED_EMAILS` in `server/.env` (same Google client as the other apps) and add the two redirect URIs it prints.
 2. `docker compose up -d && (cd server && bin/rails db:prepare) && bin/dev` — dev login without Google: `http://localhost:<api-port>/dev/login/1`.
-3. `export ASDF_RUBY_VERSION=3.3.6 KAMAL_REGISTRY_PASSWORD=$(gh auth token) && kamal setup` → `https://<slug>.edwardsfamily.app`.
+3. First deploy: `export ASDF_RUBY_VERSION=3.3.6 KAMAL_REGISTRY_PASSWORD=$(gh auth token) && kamal setup` → `https://<slug>.edwardsfamily.app` (creates the Postgres accessory and proxy route; CI can't do this first one). After that, **merging to `main` deploys** — watch with `gh run watch`.
 
 Manual alternative (no estate registration): create the repo from the template on GitHub, then
 `bin/rename --name … --slug … --host … [--api-port --web-port --pg-port] [--auth none]`. `bin/rename`
@@ -37,7 +37,7 @@ deletes itself when done; placeholders are `__APP_NAME__ __APP_SLUG__ __APP_SNAK
 - **SPA serving**: `StaticController` + `root` + catch-all that 404s file-like paths (stale hashed assets on cached phones must never get HTML).
 - **Web shell**: `AuthProvider`/`useAuth` (`/api/me` → user; `signIn` posts the CSRF form; `signOut`), `Login`, `Shell` (top bar + safe-area padding), `lib/api.ts` (`api<T>()`, `json()`), minimal mobile-first CSS tokens (light/dark).
 - **PWA**: manifest + icons (`bin/make-icons "R"` makes placeholders), service worker that never intercepts `/auth` `/api` `/dev` `/up`, boot watchdog (clears SW caches after a bad deploy), `CrashGuard` error boundary, `maximum-scale=1`, safe-area insets.
-- **Ops**: `Dockerfile` (web built into `server/public`), `config/deploy.yml` + `.kamal/secrets` (secrets read from `server/.env` + `master.key`), `docker-compose.yml` (dev Postgres), `.github/workflows/ci.yml` (rspec + build + brakeman/bundler-audit; deploy job stubbed), `bin/dev`, `bin/audit-mobile.mjs` (`npm run audit:mobile`).
+- **Ops**: `Dockerfile` (web built into `server/public`), `config/deploy.yml` + `.kamal/secrets` (secrets read from `server/.env` + `master.key`), `docker-compose.yml` (dev Postgres), `.github/workflows/ci.yml` (tests + brakeman/bundler-audit on every push/PR; **merge to `main` deploys** via the estate's reusable `kamal-deploy.yml`, using repo secrets `KAMAL_SSH_KEY`/`SERVER_ENV`/`RAILS_MASTER_KEY` that `bin/new-app` sets — re-run `gh secret set SERVER_ENV` after editing `server/.env`), `bin/dev`, `bin/audit-mobile.mjs` (`npm run audit:mobile`).
 - **Specs**: rails_helper/spec_helper, FactoryBot user, request specs for sign-in/allowlist/sign-out, internal key, SPA fallback; model spec for `User`.
 
 ## Conventions for code written on top of it

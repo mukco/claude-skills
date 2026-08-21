@@ -24,6 +24,7 @@ For shipping a single app's code use the `deploy` skill; for creating a new app 
 | Backups | `edwardsfamily-backup.timer` 03:16 UTC → `/srv/backups/<date>` (14 d) + R2 bucket `edwardsfamily-backups` (90 d, pruned by the script); keys in `~/.bashrc` as `R2_*`, rclone remote `offsite:` |
 | Egress | Cloudflare WARP (proxy mode, SOCKS5 `127.0.0.1:40000`) + privoxy on the Docker `kamal` gateway `http://172.18.0.1:8118` — for hosts that block datacenter IPs (MLB, ESPN, Savant, FanGraphs) |
 | Firewall | ufw 22/80/443 only; fail2ban; unattended security upgrades |
+| CI deploys | GitHub Actions → reusable `kamal-deploy.yml` in this repo; deploy key `~/.ssh/edwardsfamily_deploy` (public half in the server's `authorized_keys` as `github-actions-deploy`); per-repo secrets `KAMAL_SSH_KEY`, `SERVER_ENV`, `RAILS_MASTER_KEY` (set by `bin/new-app`, or `gh secret set`) |
 
 ## Repo layout and the command for each job
 
@@ -36,6 +37,7 @@ server/bootstrap.sh        idempotent hardening + Docker + data dirs:  ssh root@
 dns/records.yml + dns/apply.sh                 desired A records; apply is idempotent (create/update)
 backups/backup.sh + backups/systemd/           what the timer runs (pg_dump, mysqldump, SQLite online backup, tars, rclone copy + prune)
 egress/setup-warp.sh + egress/README.md        WARP + privoxy install/repair; which env vars an app needs to use it
+.github/workflows/kamal-deploy.yml   reusable deploy every app calls after tests (merge = deploy); repo Actions access must stay `user`
 docs/runbook.md            deploy / add an app / restore / rebuild / resize, step by step
 README.md                  topology + the apps table — keep it current
 ```

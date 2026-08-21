@@ -33,7 +33,15 @@ restore, new-app registration) and **`rails-vite-template`** (creating/structuri
 the app: fill `server/.env`, add the Google redirect URIs, `kamal setup`. `--auth none` for apps with their
 own accounts (NoFuss-style); default is the Google allowlist (Family Hub / baseball-style).
 
-**Day-2 deploy** — from the app repo root: `export ASDF_RUBY_VERSION=3.3.6 KAMAL_REGISTRY_PASSWORD=$(gh auth token)`
+**Normal path: merge to the default branch.** Each app's `.github/workflows/ci.yml` runs its tests and then calls
+the reusable `mukco/edwardsfamily-infra/.github/workflows/kamal-deploy.yml@main` (installs Kamal on the
+runner, writes `.env` + `master.key` from repo secrets `SERVER_ENV`/`RAILS_MASTER_KEY`, pushes the image
+to ghcr.io with the workflow token, `kamal deploy` over SSH with `KAMAL_SSH_KEY`, then curls `/up`).
+Follow it with `gh run watch` in the app repo; a red test job means nothing deployed. `workflow_dispatch`
+is enabled for a manual run. Default branches: family-hub `main`, nofuss-app `master`, baseball `master`
+(baseball's day-to-day work happens on a feature branch; fast-forward master to deploy).
+
+**Laptop deploy (escape hatch, unchanged)** — from the app repo root: `export ASDF_RUBY_VERSION=3.3.6 KAMAL_REGISTRY_PASSWORD=$(gh auth token)`
 then `kamal deploy`. Gate first: `bundle exec rspec` + `npm run build`. Verify: `curl https://<host>/up` → 200,
 `kamal app logs`, and for UI work `npm run audit:mobile` (iPhone-viewport overflow/height audit).
 
@@ -52,6 +60,8 @@ new Droplet → `server/bootstrap.sh` → `dns/apply.sh` → `kamal setup` per a
 - **Session cookie key must be unique per app** (`config/application.rb`) — all apps share `COOKIE_DOMAIN=.edwardsfamily.app`; a copied key makes sibling apps log each other out.
 - **Datacenter IP blocks look like code bugs**: MLB 406, ESPN 403, Savant hangs, FlareSolverr "challenge timeout". Test the URL from the server *and* the laptop before touching code; fix with the WARP env, never with retries.
 - **`kamal` via asdf needs `ASDF_RUBY_VERSION=3.3.6`** outside a Ruby dir; **local `docker build` needs `--network=host`** on the laptop (buildkit npm timeouts). Kamal's own builder is fine.
+- **CI parse failure "workflow file issue" on every caller** = the infra repo's reusable-workflow access is `none`; it must be `user` (`gh api -X PUT repos/mukco/edwardsfamily-infra/actions/permissions/access -f access_level=user`). Runs that died at parse time cannot be re-run — push again.
+- **Changing a value in an app's `.env` does not reach CI** until `gh secret set SERVER_ENV --repo mukco/<repo> < <env file>` is re-run.
 - **`.kamal/secrets` can't define shell functions** — plain `$(grep '^KEY=' server/.env | cut -d= -f2-)` only; verify with `kamal secrets print`.
 - **Ubuntu's rclone (1.60) fails TLS to R2**; install current rclone. Bucket-scoped tokens 403 on `lsd offsite:` by design.
 - **SQLite apps**: databases in `storage/` on a volume, never `db/` (that holds migrations inside the image).
