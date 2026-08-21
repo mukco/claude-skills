@@ -19,7 +19,7 @@ For shipping a single app's code use the `deploy` skill; for creating a new app 
 |---|---|
 | Server | DigitalOcean Droplet `edwardsfamily`, NYC3, Ubuntu 24.04, 2 vCPU / 4 GB + 3 GB swap, 90 GB; `ssh root@157.245.123.68` (laptop key) |
 | Domain | `edwardsfamily.app` — Cloudflare Registrar + DNS (token in `~/.bashrc` as `CLOUD_FLARE_TOKEN`; export as `CLOUDFLARE_API_TOKEN`) |
-| Apps | `hub.` family-hub (Postgres) · `nofuss.` (MySQL + Redis, own auth) · `baseball.` (SQLite, FlareSolverr, WARP env) — table in the repo README |
+| Apps | `hub.` family-hub (Postgres) · `nofuss.` (MySQL + Redis, own auth) · `baseball.` (SQLite, FlareSolverr, WARP env) · `push.` (Postgres, Solid Queue in Puma, own Devise/JWT auth) — table in the repo README |
 | Data | `/srv/<app>/{storage,postgres|mysql|redis}` host dirs (Kamal volumes/accessory dirs) |
 | Backups | `edwardsfamily-backup.timer` 03:16 UTC → `/srv/backups/<date>` (14 d) + R2 bucket `edwardsfamily-backups` (90 d, pruned by the script); keys in `~/.bashrc` as `R2_*`, rclone remote `offsite:` |
 | Egress | Cloudflare WARP (proxy mode, SOCKS5 `127.0.0.1:40000`) + privoxy on the Docker `kamal` gateway `http://172.18.0.1:8118` — for hosts that block datacenter IPs (MLB, ESPN, Savant, FanGraphs) |

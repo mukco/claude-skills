@@ -38,7 +38,7 @@ the reusable `mukco/edwardsfamily-infra/.github/workflows/kamal-deploy.yml@main`
 runner, writes `.env` + `master.key` from repo secrets `SERVER_ENV`/`RAILS_MASTER_KEY`, pushes the image
 to ghcr.io with the workflow token, `kamal deploy` over SSH with `KAMAL_SSH_KEY`, then curls `/up`).
 Follow it with `gh run watch` in the app repo; a red test job means nothing deployed. `workflow_dispatch`
-is enabled for a manual run. Default branches: family-hub `main`, nofuss-app `master`, baseball `master`
+is enabled for a manual run. Default branches: family-hub `main`, nofuss-app `master`, baseball `master`, push `master`
 (baseball's day-to-day work happens on a feature branch; fast-forward master to deploy).
 
 **Laptop deploy (escape hatch, unchanged)** — from the app repo root: `export ASDF_RUBY_VERSION=3.3.6 KAMAL_REGISTRY_PASSWORD=$(gh auth token)`
