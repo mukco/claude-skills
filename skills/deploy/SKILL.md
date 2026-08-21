@@ -1,3 +1,8 @@
+---
+name: deploy
+description: "Ship an app to production on the edwardsfamily.app estate with Kamal 2 — day-2 deploys, first deploy of a new app, accessories, debugging prod, rollbacks. Estate operations live in the edwardsfamily-infra skill; app creation in rails-vite-template."
+---
+
 # Deploy
 
 Ship apps to the **edwardsfamily.app estate**: one DigitalOcean VPS, Kamal 2, Cloudflare DNS, nightly
@@ -6,8 +11,8 @@ banned the workspace (2026-08-20) and three apps had to be re-homed in a few hou
 
 Use this skill when the user says: deploy, ship, "put it live", "new app", "add an app", "add a service /
 database / redis", "why is prod down/old/blank", backup, restore, "what's running", or when a repo has
-`config/deploy.yml` + `.kamal/secrets`. (Railway is legacy — see `references/railway/` only if a project is
-still there.)
+`config/deploy.yml` + `.kamal/secrets`. Sibling skills: **`edwardsfamily-infra`** (server, DNS, backups, egress, status,
+restore, new-app registration) and **`rails-vite-template`** (creating/structuring apps). Railway is legacy — `references/railway/`.
 
 ## The estate in one table
 

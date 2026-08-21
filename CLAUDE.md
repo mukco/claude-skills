@@ -24,5 +24,7 @@ For CLI standalone installs, invoke the relevant skill automatically when the co
 | Reviewing code for quality, discussing architecture, refactoring | `principles` |
 | Writing a GitHub issue or ticket | `issue` |
 | Referencing a PR or issue number, checking repo state | `github` |
-| Deploying, shipping, or debugging an app on the edwardsfamily.app estate (Kamal/VPS), creating a new app from the template, backups/restore, Railway legacy | `deploy` |
+| Deploying or debugging an app in production (`kamal deploy`, first deploy, accessories, rollback) | `deploy` |
+| The server/estate itself: status, DNS, backups/restore, WARP egress, resize/rebuild, registering an app (`bin/new-app`) | `edwardsfamily-infra` |
+| Starting a new app, scaffolding, or working in a repo with `server/` + `web/` + `bin/dev` (came from the template); changing the template | `rails-vite-template` |
 <!-- END claude-skills -->

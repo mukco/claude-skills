@@ -66,6 +66,12 @@ Ship apps to the edwardsfamily.app estate (DigitalOcean VPS + Kamal 2 + Cloudfla
 
 ### Other
 
+#### `edwardsfamily-infra`
+Operate the edwardsfamily.app estate (DigitalOcean VPS + Kamal proxy + Cloudflare DNS + nightly R2 backups + WARP egress): `bin/status`, `bin/new-app`, `bin/restore`, server bootstrap, DNS apply, rebuild-from-nothing, capacity, and the gotchas (datacenter-IP blocks, rclone/R2 TLS, resolver negative cache). Source of truth is the `mukco/edwardsfamily-infra` repo — every change is a commit there.
+
+#### `rails-vite-template`
+Create and build apps from `mukco/rails-vite-template` (Rails 8.1 API + Vite React TS PWA, Google-allowlist or `--auth none`, Kamal-ready): the `bin/new-app` → `bin/rename` flow, what the kernel already provides (auth, SPA fallback, PWA watchdog/CrashGuard, CI, mobile audit), vertical-slice conventions, mobile-first rules, and how to evolve the template and port kernel fixes to existing apps.
+
 #### `mcp-server`
 Ruby MCP server development using the `mcp` gem. Tools, prompts, resources, transport (stdio and HTTP), LLM tool integrations, streaming, and Rails integration patterns.
 
