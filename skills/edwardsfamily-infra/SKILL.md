@@ -35,6 +35,11 @@ bin/new-app --name "X" --slug x [--auth none] [--api-port N --web-port N --pg-po
 bin/restore <app> <YYYY-MM-DD> [--offsite]     overwrite the live DB (+uploads) from a backup; asks for confirmation
 server/bootstrap.sh        idempotent hardening + Docker + data dirs:  ssh root@IP 'bash -s' < server/bootstrap.sh
 dns/records.yml + dns/apply.sh                 desired A records; apply is idempotent (create/update)
+                           NOTE: apply.sh needs CLOUDFLARE_API_TOKEN, but the token is stored under a
+                           DIFFERENT NAME (CLOUD_FLARE_TOKEN) and a non-interactive shell does not source
+                           ~/.bashrc, so it will look absent. Load it explicitly:
+                             eval "$(grep '^export CLOUD_FLARE_TOKEN' ~/.bashrc)"
+                             export CLOUDFLARE_API_TOKEN="$CLOUD_FLARE_TOKEN"
 backups/backup.sh + backups/systemd/           what the timer runs (pg_dump, mysqldump, SQLite online backup, tars, rclone copy + prune)
 egress/setup-warp.sh + egress/README.md        WARP + privoxy install/repair; which env vars an app needs to use it
 .github/workflows/kamal-deploy.yml   reusable deploy every app calls after tests (merge = deploy); repo Actions access must stay `user`
@@ -55,6 +60,11 @@ README.md                  topology + the apps table — keep it current
 - **Datacenter-IP blocks masquerade as code bugs** (MLB 406, ESPN 403, Savant hangs, FlareSolverr "challenge timeout"). Test the URL from the server and from the laptop before touching code; the fix is the WARP env (`HTTPS_PROXY`/`NO_PROXY`, and `FLARESOLVERR_PROXY_URL` for FlareSolverr), not retries.
 - **Ubuntu's rclone 1.60 fails TLS against R2** — `setup` installs current rclone. Bucket-scoped tokens 403 on `rclone lsd offsite:` by design; `rclone ls offsite:edwardsfamily-backups` is the real check.
 - **Resolver negative cache**: querying a hostname before its record exists caches NXDOMAIN for 30 min on the laptop; verify with `curl --resolve host:443:IP` or Cloudflare DoH.
+- **The Cloudflare token is real, and searching for it fails.** It lives in `~/.bashrc` as
+  `CLOUD_FLARE_TOKEN`, while `dns/apply.sh` requires `CLOUDFLARE_API_TOKEN`. Two things hide it: the
+  underscore (grepping `CLOUDFLARE` misses `CLOUD_FLARE`) and non-interactive shells not sourcing
+  `.bashrc`, so it is absent from `env`. Do NOT conclude it is missing and ask the user for it — load
+  it with `eval "$(grep '^export CLOUD_FLARE_TOKEN' ~/.bashrc)"; export CLOUDFLARE_API_TOKEN="$CLOUD_FLARE_TOKEN"`.
 - **Records are DNS-only (grey cloud)** so kamal-proxy can complete Let's Encrypt; turning on Cloudflare's proxy needs SSL mode Full and is a deliberate change.
 - **Volumes are root-owned**; an image that drops privileges (NoFuss, uid 1000) needs its host dir chowned — `bootstrap.sh` does it.
 - **Railway is gone** (workspace banned 2026-08-20, data lost). Anything still mentioning it is stale; fix the doc.

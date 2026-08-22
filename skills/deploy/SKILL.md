@@ -69,6 +69,22 @@ new Droplet → `server/bootstrap.sh` → `dns/apply.sh` → `kamal setup` per a
 - **Ubuntu's rclone (1.60) fails TLS to R2**; install current rclone. Bucket-scoped tokens 403 on `lsd offsite:` by design.
 - **SQLite apps**: databases in `storage/` on a volume, never `db/` (that holds migrations inside the image).
 - **DNS**: records are DNS-only (grey cloud) so kamal-proxy can do ACME; my laptop's resolver caches NXDOMAIN for 30 min after a premature lookup — test with `curl --resolve`.
+- **A `workflow_dispatch` run skips the deploy and still reports success.** The deploy job is gated on
+  `github.event_name == 'push'`, so a manual run executes only the tests, marks the deploy job skipped,
+  and shows a green check — indistinguishable from a real deploy unless you read the job list for
+  `- deploy in 0s` (a dash, not a tick). Either push a commit, or widen the gate:
+  `if: contains(fromJSON('["push", "workflow_dispatch"]'), github.event_name) && github.ref == '…'`.
+- **CI secrets must exist BEFORE the first push.** `secrets: inherit` is evaluated at job start, so a
+  repo pushed seconds before `gh secret set` fails with "Secret KAMAL_SSH_KEY is required, but not
+  provided while calling." Create the repo, set secrets, *then* push.
+- **A multi-service repo needs a `.dockerignore`, or the container dies at boot.** The house Dockerfile
+  copies gems from a build stage and then `COPY <app>/ ./` over the top; without an ignore file that
+  second copy drags the laptop's `vendor/bundle` in, replacing container-compiled gems with
+  host-glibc ones. Symptom: `libc.so.6: version 'GLIBC_2.38' not found (required by …_core.so)`.
+  It also keeps `.git`, `node_modules` and any local `.venv` out of the build context.
+- **Generate `package-lock.json` with the same npm the image uses.** A lock written by a newer local
+  npm makes `npm ci` fail in the image and in CI with `Missing: <pkg>@<ver> from lock file`. Fix:
+  `docker run --rm -v "$PWD/frontend:/w" -w /w node:22-slim npm install` (then fix ownership).
 - **Never deploy before the repo's Kamal config is committed** in the app and the estate change is committed in the infra repo; "it lives in the chat" is how things get lost.
 
 ## References
