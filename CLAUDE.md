@@ -24,6 +24,7 @@ For CLI standalone installs, invoke the relevant skill automatically when the co
 | Reviewing code for quality, discussing architecture, refactoring | `principles` |
 | Writing a GitHub issue or ticket | `issue` |
 | Referencing a PR or issue number, checking repo state | `github` |
+| Changing `mukco/family-hub` or `mukco/family-hub-tv` (committing, opening a PR, deploying, rolling back) — every visible change ships a family-facing changelog entry | `changelog` |
 | Deploying or debugging an app in production (`kamal deploy`, first deploy, accessories, rollback) | `deploy` |
 | The server/estate itself: status, DNS, backups/restore, WARP egress, resize/rebuild, registering an app (`bin/new-app`) | `edwardsfamily-infra` |
 | Starting a new app, scaffolding, or working in a repo with `server/` + `web/` + `bin/dev` (came from the template); changing the template | `rails-vite-template` |
