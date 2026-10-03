@@ -1,6 +1,6 @@
 ---
 name: deploy
-description: "Ship an app to production on the edwardsfamily.app estate with Kamal 2 — day-2 deploys, first deploy of a new app, accessories, debugging prod, rollbacks. Estate operations live in the edwardsfamily-infra skill; app creation in rails-vite-template."
+description: "Ship an app to production on the edwardsfamily.app estate with Kamal 2 — day-2 deploys, first deploy of a new app, accessories, debugging prod, rollbacks, and changing an app's production config (the SERVER_ENV secret, via bin/server-env). Estate operations live in the edwardsfamily-infra skill; app creation in rails-vite-template."
 ---
 
 # Deploy
@@ -28,10 +28,18 @@ restore, new-app registration) and **`rails-vite-template`** (creating/structuri
 
 ## Workflows
 
-**New app** — from the infra repo: `bin/new-app --name "Recipe Box" --slug recipes [--auth none]`
+**New app** — from the infra repo: `bin/new-app --name "Recipe Box" --slug recipes [--api-port N --web-port N --pg-port N]`
 (template repo → `bin/rename` → DNS A record → `/srv/<slug>` → backup line → README row → commits). Then in
-the app: fill `server/.env`, add the Google redirect URIs, `kamal setup`. `--auth none` for apps with their
-own accounts (NoFuss-style); default is the Google allowlist (Family Hub / baseball-style).
+the app: fill `server/.env`, add the Google redirect URIs, `kamal setup`. There is **no `--auth` flag** —
+it exits 1 on an unknown argument; every new app gets the Google allowlist, and an app with its own accounts
+(NoFuss-style) unpicks it afterwards. There is also no `bin/add-app`, whatever `bin/rename` prints at the end.
+
+**Not every deployed thing is an app.** Something with no hostname — an internal service other containers
+dial by name — must be a Kamal **accessory**, because accessory container names are stable
+(`<service>-<accessory>`) while app containers are renamed `<service>-web-<hash>` on every deploy. It also
+must not go through `bin/new-app`, which insists on a DNS record and a public README row, and must not use
+the reusable `kamal-deploy.yml`, whose Verify step greps `host:` out of `deploy.yml` and curls it. Build and
+push the image by hand and `kamal accessory boot <name>`. See `family-hub`'s `agent` and `gateway`.
 
 **Normal path: merge to the default branch.** Each app's `.github/workflows/ci.yml` runs its tests and then calls
 the reusable `mukco/edwardsfamily-infra/.github/workflows/kamal-deploy.yml@main` (installs Kamal on the
@@ -46,7 +54,7 @@ then `kamal deploy`. Gate first: `bundle exec rspec` + `npm run build`. Verify: 
 `kamal app logs`, and for UI work `npm run audit:mobile` (iPhone-viewport overflow/height audit).
 
 **Add a database / service to an existing app** — add an `accessories:` entry to `config/deploy.yml`,
-a host dir under `/srv/<slug>/`, a secret line in `.kamal/secrets` + the app's `.env`, then
+a host dir under `/srv/<slug>/`, its secret via `bin/server-env <app> set KEY - --declare` (deploy.yml + `.kamal/secrets` PR), then
 `kamal accessory boot <name>` and `kamal deploy`. Add the dump line to `backups/backup.sh` in the infra repo.
 
 **Debug prod** — `bin/status` (infra repo) first: every host's `/up`, containers, RAM/disk, last backup,
@@ -64,11 +72,12 @@ new Droplet → `server/bootstrap.sh` → `dns/apply.sh` → `kamal setup` per a
 - **A public repo cannot call a private reusable workflow** (`error parsing called workflow … workflow was not found`). Either the caller is private or the reusable workflow lives in a public repo. Callers must also grant the permissions the callee requests (`permissions: { contents: read, packages: write }` on the calling job) or the run dies at startup.
 - **Called (reusable) workflows reject workflow-level `concurrency`** — put it on the job. `gh workflow run ci.yml --repo … --ref …` is the fast validator: it returns GitHub's parse error immediately (“error parsing called workflow”) instead of a silent `startup_failure`; lint with `docker run --rm -v "$PWD/.github/workflows:/wf:ro" rhysd/actionlint /wf/ci.yml` first. Changes to the called workflow take ~1 min to propagate to callers.
 - **CI parse failure "workflow file issue" on every caller** = the infra repo's reusable-workflow access is `none`; it must be `user` (`gh api -X PUT repos/mukco/edwardsfamily-infra/actions/permissions/access -f access_level=user`). Runs that died at parse time cannot be re-run — push again.
-- **Changing a value in an app's `.env` does not reach CI** until `gh secret set SERVER_ENV --repo mukco/<repo> < <env file>` is re-run.
+- **`SERVER_ENV` is changed with `bin/server-env` (infra repo), by the agent — never ask the user to edit it.** The secret is write-only and replace-only; its canonical copy per app is `~/.config/edwardsfamily/env/<app>.env` (700/600, exists for family-hub, nofuss, baseball, football). `bin/server-env <app> names` / `check` (vs `.kamal/secrets` on the default branch, exit 1 on missing) / `printf %s "$V" | bin/server-env <app> set KEY -` (atomic, backed up, checked, then `gh secret set`; takes effect on the next deploy) / `rebuild` (recover from the droplet's Kamal env files; names only, never overwrites without `--force`). It never prints values. A **new** key also needs `config/deploy.yml` `env: secret:` + a `.kamal/secrets` grep line (+ family-hub's `OPTIONAL` list): `set KEY - --declare` opens that PR; merge when CI is green. Set `SERVER_ENV_TRAILERS` to the session's commit trailers first. Runbook §"Secrets: SERVER_ENV".
 - **`.kamal/secrets` can't define shell functions** — plain `$(grep '^KEY=' server/.env | cut -d= -f2-)` only; verify with `kamal secrets print`.
 - **Ubuntu's rclone (1.60) fails TLS to R2**; install current rclone. Bucket-scoped tokens 403 on `lsd offsite:` by design.
 - **SQLite apps**: databases in `storage/` on a volume, never `db/` (that holds migrations inside the image).
 - **DNS**: records are DNS-only (grey cloud) so kamal-proxy can do ACME; my laptop's resolver caches NXDOMAIN for 30 min after a premature lookup — test with `curl --resolve`.
+- **A container added, removed, renamed or re-routed must be edited into `family-hub/server/app/services/ops/estate.rb` in the same commit.** That file is the estate page's whole source of truth — every container's image, repo, declaring repo, dependencies, and which of the four delivery routes it is on (`ci`, `publish_then_reboot`, `pinned_tag`, `kamal_owned`). Nothing discovers any of it. Skip the edit and `hub.edwardsfamily.app/ops` keeps drawing a wiring diagram and a pipeline diagram that are quietly wrong, which is worse than having neither. The spec fails on a `needs:` pointing at a container that does not exist, and on anything of ours reverting to hand-built; an omitted container is invisible to it.
 - **A `workflow_dispatch` run skips the deploy and still reports success.** The deploy job is gated on
   `github.event_name == 'push'`, so a manual run executes only the tests, marks the deploy job skipped,
   and shows a green check — indistinguishable from a real deploy unless you read the job list for
