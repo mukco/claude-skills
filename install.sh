@@ -9,10 +9,11 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing Claude skills from $REPO_DIR..."
 
-mkdir -p "$HOME/.claude/skills"
+mkdir -p "$HOME/.claude/skills" "$HOME/.claude/agents"
 mkdir -p "$HOME/claude-context"
 
 rsync -av "$REPO_DIR/skills/" "$HOME/.claude/skills/"
+rsync -av "$REPO_DIR/agents/" "$HOME/.claude/agents/"
 
 python3 "$REPO_DIR/merge_claude_md.py" "$REPO_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 

@@ -28,4 +28,5 @@ For CLI standalone installs, invoke the relevant skill automatically when the co
 | Deploying or debugging an app in production (`kamal deploy`, first deploy, accessories, rollback) | `deploy` |
 | The server/estate itself: status, DNS, backups/restore, WARP egress, resize/rebuild, registering an app (`bin/new-app`) | `edwardsfamily-infra` |
 | Starting a new app, scaffolding, or working in a repo with `server/` + `web/` + `bin/dev` (came from the template); changing the template | `rails-vite-template` |
+| Before opening or merging a PR in any of the estate's repos, or asked to review a branch/commit — triage picks design/security/quality reviewers, a verifier checks every finding | `review` |
 <!-- END claude-skills -->
