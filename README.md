@@ -59,6 +59,9 @@ GitHub issue writing with the WHAT/WHY/HOW framework. Covers issue structure (ti
 #### `pr`
 Creates a GitHub pull request from the current branch. Analyses commits and diff to write a concise title, summary bullets, and test-plan checklist. Pushes the branch if needed. Accepts `--draft` flag.
 
+#### `review`
+The inspection line before a merge. Fixed rules (`bin/rules`: paths and contents that always need a reviewer) and a Haiku triage agent pick which reviewers a change needs; the design, security and quality reviewers run in parallel; a verifier agent tries to disprove every finding; only confirmed findings are reported, with what was skipped and why. Design review works from real-data screenshots (`bin/tv-shots.mjs` for the TV). Reviews are logged to `~/.claude/review-log.jsonl` for a weekly check of what triage skipped. The agents live in `agents/` (`review-triage`, `review-design`, `review-security`, `review-quality`, `review-verify`) and install to `~/.claude/agents/`.
+
 ### Deployment
 
 #### `deploy`
