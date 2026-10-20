@@ -35,6 +35,10 @@ DOCS = re.compile(r"(^|/)(changelog/entries/|docs?/)|\.(md|txt)$|(^|/)(README|LI
 RULES = {
     "design": [
         (re.compile(r"(^|/)(ui|web|app/javascript|app/views|components?)/|\.(css|scss|tsx|jsx|html|erb|svg)$", re.I), None),
+        # Drawn by code rather than markup: the TV daemon's mpv cards (osd-overlay,
+        # overlay-add, ASS tags) and PIL images. #80's four film cards had no ui/
+        # file, so only the lead noticed they needed a design review (2026-10-19).
+        (None, re.compile(r"osd-overlay|overlay-add|ImageDraw|ImageFont|\\\\fs\d+|\{\\\\an\d", re.I)),
     ],
     "security": [
         (re.compile(r"(^|/)(controllers?|config|bin|system)/|Dockerfile|\.env|deploy|routes|auth|session|token|secret|credential|\.(sh|service|timer)$", re.I), None),
